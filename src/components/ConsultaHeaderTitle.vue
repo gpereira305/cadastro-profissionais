@@ -30,4 +30,21 @@ export default {
 .header-title h3 {
   font-family: var(--secondary-font);
 }
+@media (max-width: 760px) {
+  .header-title h1 {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 624px) {
+  .header-title h1 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 424px) {
+  .header-title h1 {
+    font-size: 1.65rem;
+  }
+}
 </style>

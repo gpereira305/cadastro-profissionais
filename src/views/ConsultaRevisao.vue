@@ -1,6 +1,6 @@
 <template>
   <consulta-header-title :headerTitle="headerTitle"></consulta-header-title>
-  <!-- <div class="d-flex justify-content-between align-items-center mt-3">
+  <consulta-main>
     <div class="revisao__text">
       <div class="revisao__text--content">
         <p>Nome completo</p>
@@ -36,8 +36,11 @@
         <consulta-button
           :btnTitle="btnTitle"
           :colorProp="colorProp"
-        ></consulta-button>
-        <router-link class="mt-4" to="/">Editar Cadastro</router-link>
+          :backgroundProp="backgroundProp"
+        >
+          <router-link to="/"></router-link>
+        </consulta-button>
+        <span class="mt-4" @click="redirect">Editar cadastro</span>
       </div>
     </div>
 
@@ -46,12 +49,12 @@
         <img :src="nurseImage" alt="Médicos" />
       </div>
     </div>
-  </div> -->
+  </consulta-main>
 </template>
 <script>
-import ConsultaHeaderTitle from "../components/ConsultaHeaderTitle.vue";
-import ConsultaButton from "../components/ConsultaButton.vue";
-import ConsultaMain from "../components/ConsultaMain.vue";
+import ConsultaHeaderTitle from "@/components/ConsultaHeaderTitle.vue";
+import ConsultaButton from "@/components/ConsultaButton.vue";
+import ConsultaMain from "@/components/ConsultaMain.vue";
 export default {
   name: "ConsultaRevisao",
   components: {
@@ -63,7 +66,8 @@ export default {
     return {
       headerTitle: "Revisão de cadastro",
       btnTitle: "Cadastrar Profissional",
-      colorProp: "var(--cta0)",
+      backgroundProp: "var(--cta0)",
+      colorProp: "var(--secondary7)",
 
       name: "Fabrício Rodrigues de Oliveira",
       cpf: "485.628.337-89",
@@ -76,49 +80,17 @@ export default {
       nurseImage: require("../assets/images/nurse.png"),
     };
   },
+  methods: {
+    redirect() {
+      this.$router.push("/");
+    },
+  },
 };
 </script>
 <style lang="css" scoped>
-.revisao__text {
-  width: 100%;
-  height: 100%;
-}
-
-.revisao__text--content {
-  font-family: var(--secondary-font);
-  margin-bottom: 1rem;
-}
-
-.revisao__text--content p {
-  margin-bottom: 0.3rem;
-}
-
-.revisao__text--content :first-child {
-  font-weight: 600;
-}
-
-.revisao__image {
-  width: 100%;
-}
-
-.revisao__text--button a {
+.revisao__text--button span {
   color: var(--primary0);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-@media (max-width: 1540px) {
-  .revisao__image img {
-    width: 100%;
-  }
-}
-
-/* @media (max-width: 1140px) { 
-} */
-
-@media (max-width: 990px) {
-  .revisao__image {
-    display: none;
-  }
+  font-weight: 700;
+  cursor: pointer;
 }
 </style>

@@ -1,15 +1,16 @@
 <template>
   <section class="consulta-container">
     <header>
-      <nav>
-        <router-link to="/">Consulta Profissional</router-link> |
-        <router-link :to="{ name: 'ConsultaAtendimento' }"
-          >Consulta Atendimento</router-link
+      <nav class="d-flex align-items-center">
+        <span
+          class="material-icon"
+          @click="goback"
+          v-if="this.$route.path !== '/'"
         >
-        |
-        <router-link :to="{ name: 'ConsultaRevisao' }"
-          >Consulta Revisao</router-link
-        >
+          <span class="material-symbols-outlined" title="Voltar">
+            arrow_back_ios_new
+          </span>
+        </span>
       </nav>
     </header>
     <main class="d-flex flex-column justify-content-between">
@@ -32,7 +33,11 @@ export default {
     ConsultaProfissional,
     ConsultaRevisao,
   },
-  methods: {},
+  methods: {
+    goback() {
+      this.$router.back(-1);
+    },
+  },
 };
 </script>
 
@@ -54,6 +59,7 @@ export default {
   --cta0: #fbde40;
   --cta1: #ffe766;
   --danger: #dc3545;
+
   --primary-font: "Comfortaa", cursive;
   --secondary-font: "Open Sans", sans-serif;
   --transition: all ease-in 0.3s;
@@ -71,17 +77,12 @@ body {
 }
 
 nav {
-  padding: 10px 5% 5%;
+  min-height: 12vh;
 }
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #db0000;
-  font-weight: 700;
+nav span {
+  color: var(--primary0);
+  cursor: pointer;
 }
 
 .consulta-container {
@@ -95,6 +96,55 @@ main {
   padding: 55px 0 55px 8%;
   border-radius: 20px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+/*
+*==============================
+*       COMMON  STYLE  
+*==============================
+*/
+.revisao__text {
+  width: 100%;
+  height: 100%;
+}
+
+.revisao__text--content {
+  font-family: var(--secondary-font);
+  margin-bottom: 1rem;
+}
+
+.revisao__text--content p {
+  margin-bottom: 0.3rem;
+}
+
+.revisao__text--content :first-child {
+  font-weight: 600;
+}
+
+.revisao__image {
+  width: 100%;
+}
+
+.consulta__border {
+  border: 1.5px solid var(--primary0);
+}
+
+.consulta__border::placeholder,
+.form-select {
+  color: var(--secondary3);
+  font-size: 1rem;
+}
+
+@media (max-width: 1540px) {
+  .revisao__image img {
+    width: 100%;
+  }
+}
+
+@media (max-width: 990px) {
+  .revisao__image {
+    display: none;
+  }
 }
 
 @media (max-width: 1540px) {

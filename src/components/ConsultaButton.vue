@@ -2,7 +2,7 @@
   <button
     type="button"
     class="consulta__btn"
-    :style="`background-color:${colorProp}`"
+    :style="`background-color:${backgroundProp};color:${colorProp};`"
   >
     {{ btnTitle }}
   </button>
@@ -12,15 +12,19 @@ export default {
   name: "ConsultaButton",
   props: {
     btnTitle: String,
+    backgroundProp: String,
     colorProp: String,
   },
+  data() {
+    return {};
+  },
+  methods: {},
 };
 </script>
 <style lang="css" scoped>
 .consulta__btn {
   border: none;
   outline: none;
-  color: var(--secondary7);
   border-radius: 15px;
   text-transform: uppercase;
   height: 35px;
@@ -28,8 +32,6 @@ export default {
   font-weight: 700;
   line-height: 2.4;
   transition: var(--transition);
-  /* width: 390px; */
-  /* padding: 5px 16%; */
 }
 
 .consulta__btn:hover {

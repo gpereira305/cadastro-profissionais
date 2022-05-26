@@ -11,19 +11,4 @@ export default {
   },
 };
 </script>
-<style lang="css" scoped>
-.revisao__text {
-  width: 100%;
-  height: 100%;
-}
-
-.revisao__image {
-  width: 100%;
-}
-
-@media (max-width: 990px) {
-  .revisao__image {
-    display: none;
-  }
-}
-</style>
+<style lang="css" scoped></style>
