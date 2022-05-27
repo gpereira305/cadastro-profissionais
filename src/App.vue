@@ -135,6 +135,10 @@ main {
   font-size: 1rem;
 }
 
+.consulta__border:focus {
+  border: 2px solid var(--primary0);
+}
+
 @media (max-width: 1540px) {
   .revisao__image img {
     width: 100%;

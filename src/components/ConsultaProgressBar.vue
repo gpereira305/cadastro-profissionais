@@ -12,7 +12,7 @@ export default {
   name: "ConsultaProgressBar",
   props: {
     backgroundBar: String,
-    barLength: Number,
+    barLength: String,
     barBorder: String,
     barSteps: Number,
   },

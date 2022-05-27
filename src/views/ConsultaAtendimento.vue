@@ -13,6 +13,7 @@
             class="form-select consulta__border"
             aria-label="Default select example"
             id="inputRole"
+            v-model="paymentSelection"
           >
             <option selected class="selected">Selecione</option>
             <option value="1">One</option>
@@ -21,78 +22,84 @@
           </select>
         </div>
 
-        <div class="col mt-4">
-          <label for="inputRole">Especialidade principal*</label>
+        <div class="col mt-4 ">
+          <label for="inputRole">Informe o preço da consulta*</label>
           <div class="input-group mb-3">
-            <span class="input-group-text" id="basic-addon1">R$</span>
+            <span class="input-group-text consulta__price--bg" id="basic-addon1">R$</span>
             <input
               type="text"
-              class="form-control consulta__input"
+              class="form-control consulta__input consulta__border"
               placeholder="Valor"
               aria-label="valor"
               aria-describedby="basic-addon1"
+              v-model="paymentValue"
             />
           </div>
         </div>
 
-        <div
-          style="
-            border-radius: 5px;
-            padding: 10px 35px;
-            box-shadow: rgb(0 0 0 / 18%) 0px 2px 2px;
-            margin-bottom: 1rem;
-          "
-        >
-          <div class="form-check">
+        <div class="col mt-4">
+          <label for="inputRole">Formas de pagamento da consulta*</label>
+          <div class="consulta__radios form-check mt-3">
             <input
               class="form-check-input"
               type="radio"
               name="flexRadioDefault"
               id="flexRadioDefault1"
-              checked
+              v-model="paymentForms"
+              value="pix"
+              @click="removeChecked()"
             />
-            <label class="form-check-label" for="flexRadioDefault1">Pix</label>
+            <label class="form-check-label" for="flexRadioDefault1">
+              Pix
+            </label>
           </div>
-        </div>
 
-        <div
-          style="
-            border-radius: 5px;
-            padding: 10px 35px;
-            box-shadow: rgb(0 0 0 / 18%) 0px 2px 2px;
-            margin-bottom: 1rem;
-          "
-        >
-          <div class="form-check">
+          <div class="consulta__radios form-check mt-2">
             <input
               class="form-check-input"
               type="radio"
               name="flexRadioDefault"
               id="flexRadioDefault2"
+              v-model="paymentForms"
+              value="money"
+              @click="removeChecked()"
             />
             <label class="form-check-label" for="flexRadioDefault2">
               Em dinheiro
             </label>
           </div>
-        </div>
 
-        <div
-          style="
-            border-radius: 5px;
-            padding: 10px 35px;
-            box-shadow: rgb(0 0 0 / 18%) 0px 2px 2px;
-          "
-        >
-          <div class="form-check">
+          <div class="consulta__radios form-check mt-2">
             <input
               class="form-check-input"
               type="radio"
               name="flexRadioDefault"
               id="flexRadioDefault3"
+              @click="toggleChecked()"
+              v-model="paymentForms"
+              value="creditCard"
             />
             <label class="form-check-label" for="flexRadioDefault3">
               Cartão de crédito
             </label>
+            <div
+              class="consulta__radios--toggle mt-4"
+              :class="{ activeRadios: isActive }"
+            >
+              <label class="form-check-label ms-2"> Parcelamento em </label>
+              <div class="form-check m-2" v-for="item in paymentPeriod" :key="item.id">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  :value="item.id"
+                  v-model="payTimes"
+                  name="flexRadioDefault"
+                />
+                <label class="form-check-label">
+                  {{ item.text }}
+                </label>
+              </div>
+            </div>
           </div>
         </div>
       </form>
@@ -151,11 +158,32 @@ export default {
       barBorder: "3px",
       barSteps: 2,
       patientImage: require("@/assets/images/patient.png"),
+      isActive: false,
+      
+       paymentSelection: 'Selecione',
+       paymentValue: null,
+      paymentForms: [],
+      payTimes: null,
+
+      paymentPeriod: [
+        { text: "1x sem juros", id: 1 },
+        { text: "2x sem juros", id: 2 },
+        { text: "3x sem juros", id: 3 },
+      ],
     };
   },
   methods: {
     revisao() {
       this.$router.push("/revisão-cadastro");
+      const paymentData = [this.paymentSelection, this.paymentValue, this.paymentForms, this.payTimes];
+      console.log(paymentData);
+    },
+    toggleChecked() {
+      this.isActive = !this.isActive;
+    },
+    removeChecked() {
+      this.isActive = false;
+      this.payTimes = null;
     },
   },
 };
@@ -163,5 +191,31 @@ export default {
 <style lang="css" scoped>
 .consulta__input {
   max-width: 285px;
+}
+
+.consulta__radios {
+  border-radius: 8px;
+  padding: 10px 35px;
+  margin-bottom: 1rem;
+  box-shadow: 0px 2px 3px 0px rgb(0 0 0 / 25%);
+}
+
+.consulta__radios input {
+  cursor: pointer;
+}
+
+.consulta__radios--toggle {
+  display: none; 
+}
+
+.consulta__price--bg {
+  background-color: var(--primary0); 
+  color: var(--secondary0); 
+  border: 1px solid var(--primary0)
+}
+
+.activeRadios {
+  display: flex;
+  flex-direction: column;
 }
 </style>

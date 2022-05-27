@@ -8,64 +8,62 @@
     <div class="revisao__text">
       <form>
         <div class="col mt-3">
-          <label for="inputName" class="col-form-label">Nome Completo*</label>
+          <label class="col-form-label">Nome Completo*</label>
           <input
-            id="inputName"
             type="text"
             class="form-control consulta__border"
             placeholder="Digite o nome completo"
             aria-label="Nome completo"
+            v-model="name"
           />
         </div>
         <div class="col mt-3">
-          <label for="inputCpf" class="col-form-label">CPF*</label>
+          <label class="col-form-label">CPF*</label>
           <input
-            id="inputCpf"
             type="text"
             class="form-control consulta__border consulta__input"
             placeholder="Digite um CPF"
             aria-label="Número de CPF"
+            v-model="cpf"
           />
         </div>
         <div class="col mt-3">
-          <label for="inputPhone" class="col-form-label"
-            >Número de celular*</label
-          >
+          <label class="col-form-label">Número de celular*</label>
           <input
-            id="inputPhone"
             type="text"
             class="form-control consulta__border consulta__input"
             placeholder="(00)0 0000-0000"
             aria-label="Número de celular"
+            v-model="phone"
           />
         </div>
 
         <div class="row mt-5 consulta__select">
           <div class="col">
-            <label for="inputState">Estado*</label>
+            <label>Estado*</label>
             <select
               class="form-select consulta__border"
-              aria-label="Default select example"
-              id="inputState"
+              aria-label="Selecionado padrão"
+              v-model="state"
+            
             >
-              <option selected class="selected">Selecione</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
+               <option v-for="state in allStates" :key="state.id" :value="state"   @change="getCity(state.id)">
+                 {{state.nome}}
+               </option>
             </select>
+            <span>{{state.id}}</span>
           </div>
 
           <div class="col">
-            <label for="inputCity">Cidade*</label>
+            <label>Cidade*</label>
             <select
               class="form-select consulta__border"
-              aria-label="Default select example"
-              id="inputCity"
+              aria-label="Selecionado padrão"
+              v-model="city"
             >
-              <option selected>Selecione</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
+              <option v-for="city in allCities" :key="city.id" :value="city">
+                 {{city.nome}}
+               </option>
             </select>
           </div>
         </div>
@@ -121,13 +119,50 @@ export default {
       barBorder: "3px 0 0 3px",
       barSteps: 1,
       doctorsImage: require("@/assets/images/doctors.png"),
+      
+      allStates: [],
+      allCities: [],
+
+      name: "",
+      cpf: "",
+      phone: "",
+      state: "Selecione",
+      city: "Selecione", 
     };
   },
   methods: {
     atendimento() {
       this.$router.push("/atendimento");
-    },
+      const userData = [
+        this.name ,
+        this.cpf,
+        this.phone,
+        this.state,
+        this.city,  
+      ]
+      console.log(userData, '===>');
+    }, 
+    getCity() { 
+    const apiCities = `https://api-teste-front-end-fc.herokuapp.com/cidades?estadoId=${this.state.id}`; 
+    console.log(this.state.id, 'ID')
+     fetch(apiCities)
+     .then(res => res.json())
+     .then(data => console.log(this.allCities = data))
+     .catch(err => console.log(err.message)) 
+    
+    }
   },
+  mounted(){
+    const apiStates =  `https://api-teste-front-end-fc.herokuapp.com/estados`; 
+
+     
+     fetch(apiStates)
+     .then(res => res.json())
+     .then(data => console.log(this.allStates = data))
+     .catch(err => console.log(err.message)) 
+
+
+  }, 
 };
 </script>
 <style lang="css" scoped>

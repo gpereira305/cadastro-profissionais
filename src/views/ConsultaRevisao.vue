@@ -75,7 +75,7 @@ export default {
       cityAndState: "Rio Grande do Sul - Pelotas",
       role: "Cardiologia",
       totalPrice: "200,00",
-      paymentMethod: "Catão de crédito - Parcelamento em 2x sem juros",
+      paymentMethod: "Cartão de crédito - Parcelamento em 2x sem juros",
 
       nurseImage: require("../assets/images/nurse.png"),
     };
