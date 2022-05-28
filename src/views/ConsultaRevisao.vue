@@ -2,22 +2,25 @@
   <consulta-header-title :headerTitle="headerTitle"></consulta-header-title>
   <consulta-main>
     <div class="revisao__text">
-      <div class="revisao__text--content">
-        <p>Nome completo</p>
-        <p>{{ name }}</p>
+      <div v-for="data in userData" :key="data.id">
+        <div class="revisao__text--content">
+          <p>Nome completo</p>
+          <p>{{ data.nome }}</p>
+        </div>
+        <div class="revisao__text--content">
+          <p>CPF</p>
+          <p>{{ data.cpf }}</p>
+        </div>
+        <div class="revisao__text--content">
+          <p>Número de celular ou telefone</p>
+          <p>{{ data.telefone }}</p>
+        </div>
+        <div class="revisao__text--content">
+          <p>Estado/Cidade</p>
+          <p>{{ data.cidade }}/ {{ data.estado }}</p>
+        </div>
       </div>
-      <div class="revisao__text--content">
-        <p>CPF</p>
-        <p>{{ cpf }}</p>
-      </div>
-      <div class="revisao__text--content">
-        <p>Número de celular ou telefone</p>
-        <p>{{ phone }}</p>
-      </div>
-      <div class="revisao__text--content">
-        <p>Estado/Cidade</p>
-        <p>{{ cityAndState }}</p>
-      </div>
+
       <div class="revisao__text--content">
         <p>Especialidade principal</p>
         <p>{{ role }}</p>
@@ -30,6 +33,7 @@
         <p>Formas de pagamento da consulta</p>
         <p>{{ paymentMethod }}</p>
       </div>
+
       <div
         class="revisao__text--button d-flex flex-column align-items-center mt-5"
       >
@@ -37,8 +41,8 @@
           :btnTitle="btnTitle"
           :colorProp="colorProp"
           :backgroundProp="backgroundProp"
+          @click="atendimento"
         >
-          <router-link to="/"></router-link>
         </consulta-button>
         <span class="mt-4" @click="redirect">Editar cadastro</span>
       </div>
@@ -78,11 +82,31 @@ export default {
       paymentMethod: "Cartão de crédito - Parcelamento em 2x sem juros",
 
       nurseImage: require("../assets/images/nurse.png"),
+
+      userData: [],
+      checked: this.checked,
     };
   },
   methods: {
     redirect() {
       this.$router.push("/");
+    },
+    atendimento() {
+      this.$router.push("/revisão-teste");
+    },
+  },
+  mounted() {
+    // recebe dados do localstorage
+
+    if (localStorage.checked) {
+      this.checked = JSON.parse(window.localStorage.checked);
+      this.userData.push(this.checked);
+      console.log(this.checked, "==>from local");
+    }
+  },
+  watch: {
+    dadosSalvos(novosDados) {
+      localStorage.dadosSalvos = novosDados;
     },
   },
 };

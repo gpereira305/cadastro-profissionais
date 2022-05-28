@@ -27,6 +27,7 @@
             v-model="cpf"
           />
         </div>
+
         <div class="col mt-3">
           <label class="col-form-label">Número de celular*</label>
           <input
@@ -44,14 +45,19 @@
             <select
               class="form-select consulta__border"
               aria-label="Selecionado padrão"
-              v-model="state"
-            
+              v-model="selectedEstado"
+              @change="fetchCidades"
+              :disabled="!todosEstados.length"
             >
-               <option v-for="state in allStates" :key="state.id" :value="state"   @change="getCity(state.id)">
-                 {{state.nome}}
-               </option>
+              <option selected disabled>Selecione</option>
+              <option
+                v-for="estado in todosEstados"
+                :key="estado.id"
+                :value="estado"
+              >
+                {{ estado.nome }}
+              </option>
             </select>
-            <span>{{state.id}}</span>
           </div>
 
           <div class="col">
@@ -59,11 +65,17 @@
             <select
               class="form-select consulta__border"
               aria-label="Selecionado padrão"
-              v-model="city"
+              v-model="selectedCidade"
+              :disabled="!cidadesFiltradas.length"
             >
-              <option v-for="city in allCities" :key="city.id" :value="city">
-                 {{city.nome}}
-               </option>
+              <option selected disabled>Selecione</option>
+              <option
+                v-for="cidade in cidadesFiltradas"
+                :key="cidade.id"
+                :value="cidade"
+              >
+                {{ cidade.nome }}
+              </option>
             </select>
           </div>
         </div>
@@ -80,7 +92,7 @@
           :btnTitle="btnTitle"
           :colorProp="colorProp"
           :backgroundProp="backgroundProp"
-          @click="atendimento"
+          @click="atendimento()"
         >
         </consulta-button>
       </div>
@@ -99,6 +111,8 @@ import ConsultaMain from "@/components/ConsultaMain.vue";
 import ConsultaButton from "@/components/ConsultaButton.vue";
 import ConsultaAtendimento from "./ConsultaAtendimento.vue";
 import ConsultaProgressBar from "@/components/ConsultaProgressBar.vue";
+
+import axios from "axios";
 export default {
   name: "ConsultaProfissional",
   components: {
@@ -119,50 +133,57 @@ export default {
       barBorder: "3px 0 0 3px",
       barSteps: 1,
       doctorsImage: require("@/assets/images/doctors.png"),
-      
-      allStates: [],
-      allCities: [],
+      apiEstados: "https://api-teste-front-end-fc.herokuapp.com/estados",
+      apiCidades: "https://api-teste-front-end-fc.herokuapp.com/cidades",
 
+      todosEstados: [],
+      cidadesFiltradas: [],
       name: "",
       cpf: "",
       phone: "",
-      state: "Selecione",
-      city: "Selecione", 
+      selectedEstado: "Selecione",
+      selectedCidade: "Selecione",
+
+      checked: [],
     };
   },
+
   methods: {
     atendimento() {
       this.$router.push("/atendimento");
-      const userData = [
-        this.name ,
-        this.cpf,
-        this.phone,
-        this.state,
-        this.city,  
-      ]
-      console.log(userData, '===>');
-    }, 
-    getCity() { 
-    const apiCities = `https://api-teste-front-end-fc.herokuapp.com/cidades?estadoId=${this.state.id}`; 
-    console.log(this.state.id, 'ID')
-     fetch(apiCities)
-     .then(res => res.json())
-     .then(data => console.log(this.allCities = data))
-     .catch(err => console.log(err.message)) 
-    
-    }
+      const dadosColetados = {
+        nome: this.name,
+        cpf: this.cpf,
+        telefone: this.phone,
+        estado: this.selectedEstado.nome,
+        cidade: this.selectedCidade.nome,
+      };
+      this.checked.push(dadosColetados);
+      console.log(this.checked, "dados-inputados");
+
+      localStorage.checked = JSON.stringify(dadosColetados);
+    },
+    fetchCidades() {
+      axios
+        .get(this.apiCidades)
+        .then((res) => {
+          this.cidadesFiltradas = res.data;
+          this.cidadesFiltradas = this.cidadesFiltradas.filter(
+            (cidade) => cidade.estadoId === this.selectedEstado.id
+          );
+        })
+        .catch((err) => console.log(err.message));
+    },
   },
-  mounted(){
-    const apiStates =  `https://api-teste-front-end-fc.herokuapp.com/estados`; 
 
-     
-     fetch(apiStates)
-     .then(res => res.json())
-     .then(data => console.log(this.allStates = data))
-     .catch(err => console.log(err.message)) 
-
-
-  }, 
+  mounted() {
+    axios
+      .get(this.apiEstados)
+      .then((res) => {
+        this.todosEstados = res.data;
+      })
+      .catch((err) => console.log(err.message));
+  },
 };
 </script>
 <style lang="css" scoped>

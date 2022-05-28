@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h1>Page NotFound</h1>
+    <router-link to="/revisão-cadastro">
+      <h1>Page NotFound</h1>
+    </router-link>
   </div>
 </template>
 <script>
