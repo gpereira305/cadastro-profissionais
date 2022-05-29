@@ -6,7 +6,7 @@
 
   <consulta-main>
     <div class="revisao__text">
-      <form>
+      <form @submit.prevent="atendimento">
         <!-- NOME -->
         <div class="col mt-3">
           <label class="col-form-label">Nome Completo*</label>
@@ -16,6 +16,7 @@
             placeholder="Digite o nome completo"
             aria-label="Nome completo"
             v-model="name"
+            @keypress="getApenasTexto($event)"
           />
         </div>
 
@@ -28,9 +29,9 @@
             placeholder="Digite um CPF"
             aria-label="Número de CPF"
             v-model.trim="cpf"
-            maxlength="11"
-            @keypress="getOnlyNumbers"
+            @keypress="getApenasNums"
             @keyup="getUsuarioCPF"
+            v-mask="['###.###.###-##']"
           />
         </div>
 
@@ -40,9 +41,11 @@
           <input
             type="text"
             class="form-control consulta__border consulta__input"
-            placeholder="(00)0 0000-0000"
+            placeholder="(00) 00000-0000"
             aria-label="Número de celular"
             v-model="phone"
+            @keypress="getApenasNums"
+            v-mask="['(##) ####-####', '(##) #####-####']"
           />
         </div>
 
@@ -57,7 +60,7 @@
               @change="fetchCidades"
               :disabled="!todosEstados.length"
             >
-              <option selected disabled>Selecione</option>
+              <option>Selecione</option>
               <option
                 v-for="estado in todosEstados"
                 :key="estado.id"
@@ -87,23 +90,24 @@
             </select>
           </div>
         </div>
-      </form>
 
-      <consulta-progress-bar
-        :barLength="barLength"
-        :barBorder="barBorder"
-        :barSteps="barSteps"
-      ></consulta-progress-bar>
+        <consulta-progress-bar
+          :barLength="barLength"
+          :barBorder="barBorder"
+          :barSteps="barSteps"
+        ></consulta-progress-bar>
 
-      <div class="revisao__text--button d-flex flex-column align-items-center">
-        <consulta-button
-          :btnTitle="btnTitle"
-          :colorProp="colorProp"
-          :backgroundProp="backgroundProp"
-          @click="atendimento()"
+        <div
+          class="revisao__text--button d-flex flex-column align-items-center"
         >
-        </consulta-button>
-      </div>
+          <consulta-button
+            :btnTitle="btnTitle"
+            :colorProp="colorProp"
+            :backgroundProp="backgroundProp"
+          >
+          </consulta-button>
+        </div>
+      </form>
     </div>
 
     <div class="revisao__image">
@@ -121,8 +125,12 @@ import ConsultaAtendimento from "./ConsultaAtendimento.vue";
 import ConsultaProgressBar from "@/components/ConsultaProgressBar.vue";
 
 import axios from "axios";
+import { mask } from "vue-the-mask";
+
 export default {
   name: "ConsultaProfissional",
+  directives: { mask },
+
   components: {
     ConsultaHeaderTitle,
     ConsultaMain,
@@ -141,13 +149,11 @@ export default {
       barBorder: "3px 0 0 3px",
       barSteps: 1,
       doctorsImage: require("@/assets/images/doctors.png"),
-      // apiEstados: "https://api-teste-front-end-fc.herokuapp.com/estados",
       apiCidades: "https://api-teste-front-end-fc.herokuapp.com/cidades",
       apiDados: [
         "https://api-teste-front-end-fc.herokuapp.com/estados",
         "https://api-teste-front-end-fc.herokuapp.com/profissionais",
       ],
-
       todosEstados: [],
       cidadesFiltradas: [],
       name: "",
@@ -158,12 +164,38 @@ export default {
 
       checked: [],
       profissionais: [],
+      errors: [],
     };
   },
 
   methods: {
     atendimento() {
-      this.$router.push("/atendimento");
+      if (!this.name) {
+        this.$swal("Nome obrigatório!");
+        return;
+      } else if (this.name.length < 6) {
+        this.$swal("Nome precisa ser maior do que 6 caracteres!");
+        return;
+      } else if (!this.cpf) {
+        this.$swal("CPF é obrigatório!");
+        return;
+      } else if (this.cpf.length < 14) {
+        this.$swal("CPF precisa ter 11 caracteres!");
+        return;
+      } else if (!this.phone) {
+        this.$swal("Telefone é obrigatório!");
+        return;
+      } else if (this.phone.length < 15) {
+        this.$swal("Telefone precisa ter 11 caracteres!");
+        return;
+      } else if (!this.selectedEstado.nome) {
+        this.$swal("Estado é obrigatório!");
+        return;
+      } else if (!this.selectedCidade.nome) {
+        this.$swal("Cidade é obrigatório!");
+        return;
+      }
+
       const dadosColetados = {
         nome: this.name,
         cpf: this.cpf,
@@ -172,9 +204,8 @@ export default {
         cidade: this.selectedCidade.nome,
       };
       this.checked.push(dadosColetados);
-      // console.log(this.checked, "dados-inputados");
-
       localStorage.checked = JSON.stringify(dadosColetados);
+      // this.$router.push("/atendimento");
     },
     fetchCidades() {
       axios
@@ -188,7 +219,7 @@ export default {
         .catch((err) => console.log(err.message));
     },
 
-    getOnlyNumbers(e) {
+    getApenasNums(e) {
       e = e ? e : window.event;
       const charCode = e.which ? e.which : e.keyCode;
       if (
@@ -202,17 +233,17 @@ export default {
       }
     },
 
+    getApenasTexto(e) {
+      const char = String.fromCharCode(e.keyCode);
+      if (/^[A-Za-z]+$/.test(char)) return true;
+      else e.preventDefault();
+    },
+
     getUsuarioCPF() {
       if (this.profissionais.some((item) => item.cpf === this.cpf)) {
         alert("Já cadastrado, tento outro!");
         this.cpf = "";
       }
-      // if (
-      //   this.cpf.length === 11 &&
-      //   this.profissionais.some((item) => item.cpf !== this.cpf)
-      // ) {
-      //   alert("Cadastrado com sucesso!");
-      // }
     },
   },
 

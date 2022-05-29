@@ -6,7 +6,7 @@
 
   <consulta-main>
     <div class="revisao__text">
-      <form>
+      <form @submit.prevent="getRevisao">
         <!-- ESPECIALIDADE -->
         <div class="col">
           <label>Especialidade principal*</label>
@@ -40,6 +40,11 @@
               aria-label="valor"
               aria-describedby="basic-addon1"
               v-model="valor"
+              minlength="5"
+              maxlength="6"
+              @keypress="getApenasNums"
+              @focusout="valorCompleto"
+              v-mask="['##,##', '###,##']"
             />
           </div>
         </div>
@@ -114,26 +119,25 @@
             </div>
           </div>
         </div>
-      </form>
 
-      <consulta-progress-bar
-        :barLength="barLength"
-        :barBorder="barBorder"
-        :barSteps="barSteps"
-      ></consulta-progress-bar>
+        <consulta-progress-bar
+          :barLength="barLength"
+          :barBorder="barBorder"
+          :barSteps="barSteps"
+        ></consulta-progress-bar>
 
-      <div
-        class="revisao__text--button d-flex flex-column align-items-center mt-5"
-      >
-        <consulta-button
-          :btnTitle="btnTitle"
-          :colorProp="colorProp"
-          :backgroundProp="backgroundProp"
-          @click="getRevisao"
+        <div
+          class="revisao__text--button d-flex flex-column align-items-center mt-5"
         >
-          <router-link :to="{ name: 'ConsultaRevisao' }"></router-link>
-        </consulta-button>
-      </div>
+          <consulta-button
+            :btnTitle="btnTitle"
+            :colorProp="colorProp"
+            :backgroundProp="backgroundProp"
+          >
+            <router-link :to="{ name: 'ConsultaRevisao' }"></router-link>
+          </consulta-button>
+        </div>
+      </form>
     </div>
 
     <div class="revisao__image">
@@ -150,9 +154,11 @@ import ConsultaButton from "@/components/ConsultaButton.vue";
 import ConsultaRevisao from "./ConsultaRevisao.vue";
 import ConsultaProgressBar from "@/components/ConsultaProgressBar.vue";
 import axios from "axios";
+import { mask } from "vue-the-mask";
 
 export default {
   name: "ConsultaAtendimento",
+  directives: { mask },
   components: {
     ConsultaHeaderTitle,
     ConsultaMain,
@@ -201,14 +207,30 @@ export default {
       console.log(dadosAtendimento);
       localStorage.atendimento = JSON.stringify(dadosAtendimento);
     },
-
     toggleChecked() {
       this.isActive = !this.isActive;
     },
-
     removeChecked() {
       this.isActive = false;
       this.payTimes = null;
+    },
+    valorCompleto() {
+      if (this.valor.length < 5) {
+        alert("Digite entre 5 a 6 dígitos");
+      }
+    },
+    getApenasNums(e) {
+      e = e ? e : window.event;
+      const charCode = e.which ? e.which : e.keyCode;
+      if (
+        charCode > 31 &&
+        (charCode < 48 || charCode > 57) &&
+        charCode !== 46
+      ) {
+        e.preventDefault();
+      } else {
+        return true;
+      }
     },
   },
   mounted() {

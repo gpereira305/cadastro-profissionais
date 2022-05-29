@@ -1,6 +1,6 @@
 <template>
   <button
-    type="button"
+    type="submit"
     class="consulta__btn"
     :style="`background-color:${backgroundProp};color:${colorProp};`"
   >
