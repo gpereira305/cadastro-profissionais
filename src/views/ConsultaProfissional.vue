@@ -7,6 +7,7 @@
   <consulta-main>
     <div class="revisao__text">
       <form>
+        <!-- NOME -->
         <div class="col mt-3">
           <label class="col-form-label">Nome Completo*</label>
           <input
@@ -17,6 +18,8 @@
             v-model="name"
           />
         </div>
+
+        <!-- CPF -->
         <div class="col mt-3">
           <label class="col-form-label">CPF*</label>
           <input
@@ -24,10 +27,14 @@
             class="form-control consulta__border consulta__input"
             placeholder="Digite um CPF"
             aria-label="Número de CPF"
-            v-model="cpf"
+            v-model.trim="cpf"
+            maxlength="11"
+            @keypress="getOnlyNumbers"
+            @keyup="getUsuarioCPF"
           />
         </div>
 
+        <!-- TELEFONE -->
         <div class="col mt-3">
           <label class="col-form-label">Número de celular*</label>
           <input
@@ -39,6 +46,7 @@
           />
         </div>
 
+        <!-- CIDADE/ESTADO -->
         <div class="row mt-5 consulta__select">
           <div class="col">
             <label>Estado*</label>
@@ -133,8 +141,12 @@ export default {
       barBorder: "3px 0 0 3px",
       barSteps: 1,
       doctorsImage: require("@/assets/images/doctors.png"),
-      apiEstados: "https://api-teste-front-end-fc.herokuapp.com/estados",
+      // apiEstados: "https://api-teste-front-end-fc.herokuapp.com/estados",
       apiCidades: "https://api-teste-front-end-fc.herokuapp.com/cidades",
+      apiDados: [
+        "https://api-teste-front-end-fc.herokuapp.com/estados",
+        "https://api-teste-front-end-fc.herokuapp.com/profissionais",
+      ],
 
       todosEstados: [],
       cidadesFiltradas: [],
@@ -145,6 +157,7 @@ export default {
       selectedCidade: "Selecione",
 
       checked: [],
+      profissionais: [],
     };
   },
 
@@ -159,7 +172,7 @@ export default {
         cidade: this.selectedCidade.nome,
       };
       this.checked.push(dadosColetados);
-      console.log(this.checked, "dados-inputados");
+      // console.log(this.checked, "dados-inputados");
 
       localStorage.checked = JSON.stringify(dadosColetados);
     },
@@ -174,14 +187,45 @@ export default {
         })
         .catch((err) => console.log(err.message));
     },
+
+    getOnlyNumbers(e) {
+      e = e ? e : window.event;
+      const charCode = e.which ? e.which : e.keyCode;
+      if (
+        charCode > 31 &&
+        (charCode < 48 || charCode > 57) &&
+        charCode !== 46
+      ) {
+        e.preventDefault();
+      } else {
+        return true;
+      }
+    },
+
+    getUsuarioCPF() {
+      if (this.profissionais.some((item) => item.cpf === this.cpf)) {
+        alert("Já cadastrado, tento outro!");
+        this.cpf = "";
+      }
+      // if (
+      //   this.cpf.length === 11 &&
+      //   this.profissionais.some((item) => item.cpf !== this.cpf)
+      // ) {
+      //   alert("Cadastrado com sucesso!");
+      // }
+    },
   },
 
   mounted() {
     axios
-      .get(this.apiEstados)
-      .then((res) => {
-        this.todosEstados = res.data;
-      })
+      .all(this.apiDados.map((data) => axios.get(data)))
+      .then(
+        axios.spread(({ data: todosEstados }, { data: profissionais }) => {
+          (this.todosEstados = todosEstados),
+            (this.profissionais = profissionais);
+          this.profissionais[profissionais];
+        })
+      )
       .catch((err) => console.log(err.message));
   },
 };

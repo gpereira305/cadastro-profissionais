@@ -114,11 +114,16 @@ main {
 }
 
 .revisao__text--content p {
-  margin-bottom: 0.3rem;
+  margin-bottom: 0;
 }
 
-.revisao__text--content :first-child {
-  font-weight: 600;
+.revisao__text--content p:first-child {
+  font-weight: 700;
+}
+
+.revisao__text--content p:last-child {
+  color: rgb(0 0 0 / 70%);
+  font-weight: 500;
 }
 
 .revisao__image {

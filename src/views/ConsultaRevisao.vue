@@ -2,7 +2,7 @@
   <consulta-header-title :headerTitle="headerTitle"></consulta-header-title>
   <consulta-main>
     <div class="revisao__text">
-      <div v-for="data in userData" :key="data.id">
+      <div v-for="data in dadosColetados" :key="data.id">
         <div class="revisao__text--content">
           <p>Nome completo</p>
           <p>{{ data.nome }}</p>
@@ -17,21 +17,26 @@
         </div>
         <div class="revisao__text--content">
           <p>Estado/Cidade</p>
-          <p>{{ data.cidade }}/ {{ data.estado }}</p>
+          <p>{{ data.estado }} / {{ data.cidade }}</p>
         </div>
-      </div>
+        <div class="revisao__text--content">
+          <p>Especialidade principal</p>
+          <p>{{ data.especialidade }}</p>
+        </div>
+        <div class="revisao__text--content">
+          <p>Preço da consulta</p>
+          <p>R$ {{ data.valor }}</p>
+        </div>
 
-      <div class="revisao__text--content">
-        <p>Especialidade principal</p>
-        <p>{{ role }}</p>
-      </div>
-      <div class="revisao__text--content">
-        <p>Preço da consulta</p>
-        <p>R$ {{ totalPrice }}</p>
-      </div>
-      <div class="revisao__text--content">
-        <p>Formas de pagamento da consulta</p>
-        <p>{{ paymentMethod }}</p>
+        <div class="revisao__text--content">
+          <p>Formas de pagamento da consulta</p>
+          <p>
+            {{ data.pagamento }}
+            <span v-if="data.pagamento === 'Cartão de crédito'">
+              - Parcelamento em {{ data.parcelamento }}x sem juros</span
+            >
+          </p>
+        </div>
       </div>
 
       <div
@@ -41,10 +46,10 @@
           :btnTitle="btnTitle"
           :colorProp="colorProp"
           :backgroundProp="backgroundProp"
-          @click="atendimento"
+          @click="getCadastro"
         >
         </consulta-button>
-        <span class="mt-4" @click="redirect">Editar cadastro</span>
+        <span class="mt-4" @click="redirecionarHome">Editar cadastro</span>
       </div>
     </div>
 
@@ -83,31 +88,29 @@ export default {
 
       nurseImage: require("../assets/images/nurse.png"),
 
-      userData: [],
+      dadosColetados: [],
       checked: this.checked,
+      atendimento: this.atendimento,
+      todosOsDadosSalvos: {},
     };
   },
   methods: {
-    redirect() {
+    redirecionarHome() {
       this.$router.push("/");
     },
-    atendimento() {
+    getCadastro() {
       this.$router.push("/revisão-teste");
     },
   },
   mounted() {
     // recebe dados do localstorage
 
-    if (localStorage.checked) {
+    if (localStorage.checked || localStorage.atendimento) {
       this.checked = JSON.parse(window.localStorage.checked);
-      this.userData.push(this.checked);
-      console.log(this.checked, "==>from local");
+      this.atendimento = JSON.parse(window.localStorage.atendimento);
+      this.todosOsDadosSalvos = Object.assign(this.checked, this.atendimento);
+      this.dadosColetados.push(this.todosOsDadosSalvos);
     }
-  },
-  watch: {
-    dadosSalvos(novosDados) {
-      localStorage.dadosSalvos = novosDados;
-    },
   },
 };
 </script>

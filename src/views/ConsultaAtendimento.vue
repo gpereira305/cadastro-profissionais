@@ -7,36 +7,44 @@
   <consulta-main>
     <div class="revisao__text">
       <form>
+        <!-- ESPECIALIDADE -->
         <div class="col">
-          <label for="inputRole">Especialidade principal*</label>
+          <label>Especialidade principal*</label>
           <select
             class="form-select consulta__border"
-            aria-label="Default select example"
-            id="inputRole"
-            v-model="paymentSelection"
+            aria-label="Selecionado padrão"
+            v-model="selectedEspecialidade"
           >
-            <option selected class="selected">Selecione</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
+            <option selected disabled>Selecione</option>
+            <option
+              v-for="especialidade in especialidades"
+              :key="especialidade.id"
+              :value="especialidade"
+            >
+              {{ especialidade.nome }}
+            </option>
           </select>
         </div>
 
-        <div class="col mt-4 ">
+        <!-- PREÇO -->
+        <div class="col mt-4">
           <label for="inputRole">Informe o preço da consulta*</label>
           <div class="input-group mb-3">
-            <span class="input-group-text consulta__price--bg" id="basic-addon1">R$</span>
+            <span class="input-group-text consulta__price--bg" id="basic-addon1"
+              >R$</span
+            >
             <input
               type="text"
               class="form-control consulta__input consulta__border"
               placeholder="Valor"
               aria-label="valor"
               aria-describedby="basic-addon1"
-              v-model="paymentValue"
+              v-model="valor"
             />
           </div>
         </div>
 
+        <!-- PAGAMENTNO -->
         <div class="col mt-4">
           <label for="inputRole">Formas de pagamento da consulta*</label>
           <div class="consulta__radios form-check mt-3">
@@ -45,8 +53,8 @@
               type="radio"
               name="flexRadioDefault"
               id="flexRadioDefault1"
-              v-model="paymentForms"
-              value="pix"
+              v-model="pagamento"
+              value="Pix"
               @click="removeChecked()"
             />
             <label class="form-check-label" for="flexRadioDefault1">
@@ -60,8 +68,8 @@
               type="radio"
               name="flexRadioDefault"
               id="flexRadioDefault2"
-              v-model="paymentForms"
-              value="money"
+              v-model="pagamento"
+              value="Dinheiro"
               @click="removeChecked()"
             />
             <label class="form-check-label" for="flexRadioDefault2">
@@ -76,8 +84,8 @@
               name="flexRadioDefault"
               id="flexRadioDefault3"
               @click="toggleChecked()"
-              v-model="paymentForms"
-              value="creditCard"
+              v-model="pagamento"
+              value="Cartão de crédito"
             />
             <label class="form-check-label" for="flexRadioDefault3">
               Cartão de crédito
@@ -87,12 +95,16 @@
               :class="{ activeRadios: isActive }"
             >
               <label class="form-check-label ms-2"> Parcelamento em </label>
-              <div class="form-check m-2" v-for="item in paymentPeriod" :key="item.id">
+              <div
+                class="form-check m-2"
+                v-for="item in paymentPeriod"
+                :key="item.id"
+              >
                 <input
                   class="form-check-input"
                   type="radio"
                   :value="item.id"
-                  v-model="payTimes"
+                  v-model="parcelamento"
                   name="flexRadioDefault"
                 />
                 <label class="form-check-label">
@@ -117,7 +129,7 @@
           :btnTitle="btnTitle"
           :colorProp="colorProp"
           :backgroundProp="backgroundProp"
-          @click="revisao"
+          @click="getRevisao"
         >
           <router-link :to="{ name: 'ConsultaRevisao' }"></router-link>
         </consulta-button>
@@ -137,6 +149,7 @@ import ConsultaMain from "@/components/ConsultaMain.vue";
 import ConsultaButton from "@/components/ConsultaButton.vue";
 import ConsultaRevisao from "./ConsultaRevisao.vue";
 import ConsultaProgressBar from "@/components/ConsultaProgressBar.vue";
+import axios from "axios";
 
 export default {
   name: "ConsultaAtendimento",
@@ -158,12 +171,16 @@ export default {
       barBorder: "3px",
       barSteps: 2,
       patientImage: require("@/assets/images/patient.png"),
+      apiEspacialidades:
+        "https://api-teste-front-end-fc.herokuapp.com/especialidades",
       isActive: false,
-      
-       paymentSelection: 'Selecione',
-       paymentValue: null,
-      paymentForms: [],
-      payTimes: null,
+      selectedEspecialidade: "Selecione",
+
+      valor: null,
+      pagamento: [],
+      especialidades: [],
+      parcelamento: null,
+      atendimento: [],
 
       paymentPeriod: [
         { text: "1x sem juros", id: 1 },
@@ -173,18 +190,34 @@ export default {
     };
   },
   methods: {
-    revisao() {
+    getRevisao() {
       this.$router.push("/revisão-cadastro");
-      const paymentData = [this.paymentSelection, this.paymentValue, this.paymentForms, this.payTimes];
-      console.log(paymentData);
+      const dadosAtendimento = {
+        especialidade: this.selectedEspecialidade.nome,
+        valor: this.valor,
+        pagamento: this.pagamento,
+        parcelamento: this.parcelamento,
+      };
+      console.log(dadosAtendimento);
+      localStorage.atendimento = JSON.stringify(dadosAtendimento);
     },
+
     toggleChecked() {
       this.isActive = !this.isActive;
     },
+
     removeChecked() {
       this.isActive = false;
       this.payTimes = null;
     },
+  },
+  mounted() {
+    axios
+      .get(this.apiEspacialidades)
+      .then((res) => {
+        this.especialidades = res.data;
+      })
+      .catch((err) => console.log(err.message));
   },
 };
 </script>
@@ -205,13 +238,13 @@ export default {
 }
 
 .consulta__radios--toggle {
-  display: none; 
+  display: none;
 }
 
 .consulta__price--bg {
-  background-color: var(--primary0); 
-  color: var(--secondary0); 
-  border: 1px solid var(--primary0)
+  background-color: var(--primary0);
+  color: var(--secondary0);
+  border: 1px solid var(--primary0);
 }
 
 .activeRadios {

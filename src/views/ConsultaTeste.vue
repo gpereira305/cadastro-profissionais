@@ -3,7 +3,7 @@
     class="d-flex justify-content-center align-items-center"
     style="height: 68vh"
   >
-    <h1>FIM</h1>
+    <h1>CADASTRO FEITO COM SUCESSO!</h1>
   </div>
 </template>
 
