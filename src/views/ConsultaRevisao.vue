@@ -17,7 +17,7 @@
         </div>
         <div class="revisao__text--content">
           <p>Estado/Cidade</p>
-          <p>{{ data.estado }} / {{ data.cidade }}</p>
+          <p>{{ data.estado.nome }} / {{ data.cidade.nome }}</p>
         </div>
         <div class="revisao__text--content">
           <p>Especialidade principal</p>
@@ -89,8 +89,8 @@ export default {
       nurseImage: require("../assets/images/nurse.png"),
 
       dadosColetados: [],
-      checked: this.checked,
-      atendimento: this.atendimento,
+      dados_usuario: this.dados_usuario,
+      dados_atendimento: this.dados_atendimento,
       todosOsDadosSalvos: {},
     };
   },
@@ -99,16 +99,19 @@ export default {
       this.$router.push("/");
     },
     getCadastro() {
-      this.$router.push("/revisão-teste");
+      this.$router.push("/resumo");
     },
   },
   mounted() {
-    // recebe dados do localstorage
-
-    if (localStorage.checked || localStorage.atendimento) {
-      this.checked = JSON.parse(window.localStorage.checked);
-      this.atendimento = JSON.parse(window.localStorage.atendimento);
-      this.todosOsDadosSalvos = Object.assign(this.checked, this.atendimento);
+    if (localStorage.dados_usuario || localStorage.dados_atendimento) {
+      this.dados_usuario = JSON.parse(window.localStorage.dados_usuario);
+      this.dados_atendimento = JSON.parse(
+        window.localStorage.dados_atendimento
+      );
+      this.todosOsDadosSalvos = Object.assign(
+        this.dados_usuario,
+        this.dados_atendimento
+      );
       this.dadosColetados.push(this.todosOsDadosSalvos);
     }
   },

@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import ConsultaProfissional from "../views/ConsultaProfissional.vue";
 import ConsultaAtendimento from "../views/ConsultaAtendimento.vue";
 import ConsultaRevisao from "../views/ConsultaRevisao.vue";
-import ConsultaTeste from '../views/ConsultaTeste.vue'
+import ConsultaResumo from "../views/ConsultaResumo.vue";
 
 import ConsultaNotFound from "../views/ConsultaNotFound.vue";
 
@@ -18,14 +18,14 @@ const routes = [
     component: ConsultaAtendimento,
   },
   {
-    path: "/revisão-cadastro",
+    path: "/revisão",
     name: "ConsultaRevisao",
     component: ConsultaRevisao,
   },
   {
-    path: "/revisão-teste",
-    name: "ConsultaTeste",
-    component: ConsultaTeste,
+    path: "/resumo",
+    name: "ConsultaResumo",
+    component: ConsultaResumo,
   },
   {
     path: "/:catchAll(.*)",

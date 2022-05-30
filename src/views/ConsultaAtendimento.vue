@@ -43,7 +43,6 @@
               minlength="5"
               maxlength="6"
               @keypress="getApenasNums"
-              @focusout="valorCompleto"
               v-mask="['##,##', '###,##']"
             />
           </div>
@@ -102,7 +101,7 @@
               <label class="form-check-label ms-2"> Parcelamento em </label>
               <div
                 class="form-check m-2"
-                v-for="item in paymentPeriod"
+                v-for="item in parcelas"
                 :key="item.id"
               >
                 <input
@@ -186,9 +185,9 @@ export default {
       pagamento: [],
       especialidades: [],
       parcelamento: null,
-      atendimento: [],
+      dados_atendimento: [],
 
-      paymentPeriod: [
+      parcelas: [
         { text: "1x sem juros", id: 1 },
         { text: "2x sem juros", id: 2 },
         { text: "3x sem juros", id: 3 },
@@ -197,15 +196,48 @@ export default {
   },
   methods: {
     getRevisao() {
-      this.$router.push("/revisão-cadastro");
+      if (!this.selectedEspecialidade.nome) {
+        this.$toast.open({
+          message: "A especialidade do profissional é obrigatório!",
+        });
+        return;
+      } else if (!this.valor) {
+        this.$toast.open({
+          message: "Valor é obrigatório!",
+        });
+        return;
+      } else if (
+        this.valor.replace(/\,/g, "") < 3000 ||
+        this.valor.replace(/\,/g, "") > 35000
+      ) {
+        this.$toast.open({
+          message: "O valor estar entre 30,00 e 350,00",
+        });
+        return;
+      } else if (
+        this.pagamento !== "Pix" &&
+        this.pagamento !== "Dinheiro" &&
+        this.pagamento !== "Cartão de crédito"
+      ) {
+        this.$toast.open({
+          message: "Forma de pagamento é obrigatório!",
+        });
+        return;
+      } else if (this.pagamento === "Cartão de crédito" && !this.parcelamento) {
+        this.$toast.open({
+          message: "A quantidade de parcelas é obrigatório!",
+        });
+        return;
+      }
+
+      this.$router.push("/revisão");
       const dadosAtendimento = {
         especialidade: this.selectedEspecialidade.nome,
         valor: this.valor,
         pagamento: this.pagamento,
         parcelamento: this.parcelamento,
       };
-      console.log(dadosAtendimento);
-      localStorage.atendimento = JSON.stringify(dadosAtendimento);
+      localStorage.dados_atendimento = JSON.stringify(dadosAtendimento);
     },
     toggleChecked() {
       this.isActive = !this.isActive;
@@ -213,11 +245,6 @@ export default {
     removeChecked() {
       this.isActive = false;
       this.payTimes = null;
-    },
-    valorCompleto() {
-      if (this.valor.length < 5) {
-        alert("Digite entre 5 a 6 dígitos");
-      }
     },
     getApenasNums(e) {
       e = e ? e : window.event;

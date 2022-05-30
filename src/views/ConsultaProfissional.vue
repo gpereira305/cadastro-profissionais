@@ -6,7 +6,7 @@
 
   <consulta-main>
     <div class="revisao__text">
-      <form @submit.prevent="atendimento">
+      <form @submit.prevent="getTodosOsDados">
         <!-- NOME -->
         <div class="col mt-3">
           <label class="col-form-label">Nome Completo*</label>
@@ -15,8 +15,8 @@
             class="form-control consulta__border"
             placeholder="Digite o nome completo"
             aria-label="Nome completo"
-            v-model="name"
-            @keypress="getApenasTexto($event)"
+            v-model="nome"
+            @keypress="getApenasTexto"
           />
         </div>
 
@@ -30,7 +30,6 @@
             aria-label="Número de CPF"
             v-model.trim="cpf"
             @keypress="getApenasNums"
-            @keyup="getUsuarioCPF"
             v-mask="['###.###.###-##']"
           />
         </div>
@@ -43,7 +42,7 @@
             class="form-control consulta__border consulta__input"
             placeholder="(00) 00000-0000"
             aria-label="Número de celular"
-            v-model="phone"
+            v-model="telefone"
             @keypress="getApenasNums"
             v-mask="['(##) ####-####', '(##) #####-####']"
           />
@@ -60,7 +59,7 @@
               @change="fetchCidades"
               :disabled="!todosEstados.length"
             >
-              <option>Selecione</option>
+              <option>{{ selectedEstado }}</option>
               <option
                 v-for="estado in todosEstados"
                 :key="estado.id"
@@ -79,7 +78,9 @@
               v-model="selectedCidade"
               :disabled="!cidadesFiltradas.length"
             >
-              <option selected disabled>Selecione</option>
+              <option selected disabled>
+                {{ selectedCidade }}
+              </option>
               <option
                 v-for="cidade in cidadesFiltradas"
                 :key="cidade.id"
@@ -156,56 +157,84 @@ export default {
       ],
       todosEstados: [],
       cidadesFiltradas: [],
-      name: "",
-      cpf: "",
-      phone: "",
-      selectedEstado: "Selecione",
-      selectedCidade: "Selecione",
 
-      checked: [],
+      nome: this.nome || "",
+      cpf: this.cpf || "",
+      telefone: this.telefone || "",
+      selectedEstado: this.selectedEstado || "Selecione",
+      selectedCidade: this.selectedCidade || "Selecione",
+
+      dados_usuario: [],
       profissionais: [],
-      errors: [],
     };
   },
 
   methods: {
-    atendimento() {
-      if (!this.name) {
-        this.$swal("Nome obrigatório!");
+    getTodosOsDados() {
+      const cpfIsValid = this.profissionais.some(
+        (item) => item.cpf === this.cpf.replace(/[\. ,:-]+/g, "")
+      );
+
+      if (!this.nome) {
+        this.$toast.open({
+          message: "Nome é obrigatório!",
+        });
         return;
-      } else if (this.name.length < 6) {
-        this.$swal("Nome precisa ser maior do que 6 caracteres!");
+      } else if (this.nome.length < 6) {
+        this.$toast.open({
+          message: "O nome precisa ser maior do que 6 caracteres!",
+        });
         return;
       } else if (!this.cpf) {
-        this.$swal("CPF é obrigatório!");
+        this.$toast.open({
+          message: "CPF é obrigatório!",
+        });
         return;
       } else if (this.cpf.length < 14) {
-        this.$swal("CPF precisa ter 11 caracteres!");
+        this.$toast.open({
+          message: "O CPF precisa ter 11 caracteres!",
+        });
         return;
-      } else if (!this.phone) {
-        this.$swal("Telefone é obrigatório!");
+      } else if (!this.telefone) {
+        this.$toast.open({
+          message: "Telefone é obrigatório!",
+        });
         return;
-      } else if (this.phone.length < 15) {
-        this.$swal("Telefone precisa ter 11 caracteres!");
+      } else if (this.telefone.length < 15) {
+        this.$toast.open({
+          message: "O telefone precisa ter 11 caracteres!",
+        });
         return;
       } else if (!this.selectedEstado.nome) {
-        this.$swal("Estado é obrigatório!");
+        this.$toast.open({
+          message: "Estado é obrigatório!",
+        });
         return;
       } else if (!this.selectedCidade.nome) {
-        this.$swal("Cidade é obrigatório!");
+        this.$toast.open({
+          message: "Cidade é obrigatório!",
+        });
         return;
-      }
+      } else if (cpfIsValid) {
+        this.$toast.open({
+          message: "CPF já cadastrado!",
+        });
+        return;
+      } else {
+        const dadosColetados = {
+          nome: this.nome,
+          cpf: this.cpf,
+          telefone: this.telefone,
+          estado: this.selectedEstado,
+          cidade: this.selectedCidade,
+        };
 
-      const dadosColetados = {
-        nome: this.name,
-        cpf: this.cpf,
-        telefone: this.phone,
-        estado: this.selectedEstado.nome,
-        cidade: this.selectedCidade.nome,
-      };
-      this.checked.push(dadosColetados);
-      localStorage.checked = JSON.stringify(dadosColetados);
-      // this.$router.push("/atendimento");
+        if (!dadosColetados) {
+          this.dados_usuario.push(dadosColetados);
+        }
+        localStorage.dados_usuario = JSON.stringify(dadosColetados);
+        this.$router.push("/atendimento");
+      }
     },
     fetchCidades() {
       axios
@@ -218,7 +247,6 @@ export default {
         })
         .catch((err) => console.log(err.message));
     },
-
     getApenasNums(e) {
       e = e ? e : window.event;
       const charCode = e.which ? e.which : e.keyCode;
@@ -232,22 +260,26 @@ export default {
         return true;
       }
     },
-
     getApenasTexto(e) {
       const char = String.fromCharCode(e.keyCode);
-      if (/^[A-Za-z]+$/.test(char)) return true;
+      if (/^[A-Za-z ]+$/.test(char)) return true;
       else e.preventDefault();
     },
-
-    getUsuarioCPF() {
-      if (this.profissionais.some((item) => item.cpf === this.cpf)) {
-        alert("Já cadastrado, tento outro!");
-        this.cpf = "";
-      }
-    },
   },
-
   mounted() {
+    if (localStorage.dados_usuario) {
+      this.dados_usuario = JSON.parse(window.localStorage.dados_usuario);
+      ({
+        nome: this.nome,
+        cpf: this.cpf,
+        telefone: this.telefone,
+        cidade: this.selectedCidade,
+        estado: this.selectedEstado,
+      } = this.dados_usuario);
+
+      console.log(this.selectedEstado);
+    }
+
     axios
       .all(this.apiDados.map((data) => axios.get(data)))
       .then(

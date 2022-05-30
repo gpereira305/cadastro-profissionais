@@ -1,6 +1,6 @@
 <template>
   <div>
-    <router-link to="/revisão-cadastro">
+    <router-link to="/">
       <h1>Page NotFound</h1>
     </router-link>
   </div>
