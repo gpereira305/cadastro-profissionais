@@ -185,6 +185,11 @@ export default {
           message: "O nome precisa ser maior do que 6 caracteres!",
         });
         return;
+      } else if (this.nome.length > 30) {
+        this.$toast.open({
+          message: "O nome é muito longo!",
+        });
+        return;
       } else if (!this.cpf) {
         this.$toast.open({
           message: "CPF é obrigatório!",
@@ -276,8 +281,6 @@ export default {
         cidade: this.selectedCidade,
         estado: this.selectedEstado,
       } = this.dados_usuario);
-
-      console.log(this.selectedEstado);
     }
 
     axios

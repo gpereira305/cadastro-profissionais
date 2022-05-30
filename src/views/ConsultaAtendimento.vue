@@ -15,7 +15,7 @@
             aria-label="Selecionado padrão"
             v-model="selectedEspecialidade"
           >
-            <option selected disabled>Selecione</option>
+            <option selected disabled>{{ selectedEspecialidade }}</option>
             <option
               v-for="especialidade in especialidades"
               :key="especialidade.id"
@@ -179,7 +179,7 @@ export default {
       apiEspacialidades:
         "https://api-teste-front-end-fc.herokuapp.com/especialidades",
       isActive: false,
-      selectedEspecialidade: "Selecione",
+      selectedEspecialidade: this.selectedEspecialidade || "Selecione",
 
       valor: null,
       pagamento: [],
@@ -232,7 +232,7 @@ export default {
 
       this.$router.push("/revisão");
       const dadosAtendimento = {
-        especialidade: this.selectedEspecialidade.nome,
+        especialidade: this.selectedEspecialidade,
         valor: this.valor,
         pagamento: this.pagamento,
         parcelamento: this.parcelamento,
@@ -261,6 +261,19 @@ export default {
     },
   },
   mounted() {
+    if (localStorage.dados_atendimento) {
+      this.dados_atendimento = JSON.parse(
+        window.localStorage.dados_atendimento
+      );
+      ({
+        especialidade: this.selectedEspecialidade,
+        pagamento: this.pagamento,
+        parcelamento: this.parcelamento,
+        valor: this.valor,
+      } = this.dados_atendimento);
+
+      console.log(this.dados_atendimento);
+    }
     axios
       .get(this.apiEspacialidades)
       .then((res) => {

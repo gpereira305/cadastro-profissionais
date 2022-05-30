@@ -21,7 +21,7 @@
         </div>
         <div class="revisao__text--content">
           <p>Especialidade principal</p>
-          <p>{{ data.especialidade }}</p>
+          <p>{{ data.especialidade.nome }}</p>
         </div>
         <div class="revisao__text--content">
           <p>Preço da consulta</p>
