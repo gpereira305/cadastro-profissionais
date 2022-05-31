@@ -201,7 +201,7 @@ export default {
         return;
       } else if (this.cpf.length < 14) {
         this.$toast.open({
-          message: "O CPF precisa ter 11 caracteres!",
+          message: "O CPF precisa ter 11 dígitos!",
         });
         return;
       } else if (!this.telefone) {
@@ -211,7 +211,7 @@ export default {
         return;
       } else if (this.telefone.length < 15) {
         this.$toast.open({
-          message: "O telefone precisa ter 11 caracteres!",
+          message: "O telefone precisa ter 11 dígitos!",
         });
         return;
       } else if (!this.selected_estado.nome) {
