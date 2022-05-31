@@ -4,8 +4,6 @@ import ConsultaAtendimento from "../views/ConsultaAtendimento.vue";
 import ConsultaRevisao from "../views/ConsultaRevisao.vue";
 import ConsultaResumo from "../views/ConsultaResumo.vue";
 
-import ConsultaNotFound from "../views/ConsultaNotFound.vue";
-
 const routes = [
   {
     path: "/",
@@ -29,8 +27,8 @@ const routes = [
   },
   {
     path: "/:catchAll(.*)",
-    name: "ConsultaNotFound",
-    component: ConsultaNotFound,
+    name: "ConsultaProfissional",
+    component: ConsultaProfissional,
   },
 ];
 

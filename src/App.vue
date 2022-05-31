@@ -4,8 +4,8 @@
       <nav class="d-flex align-items-center">
         <span
           class="material-icon"
-          @click="goback"
-          v-if="this.$route.path !== '/'"
+          @click="voltarUmaPagina"
+          v-if="this.$route.path !== '/' && this.$route.path !== '/resumo'"
         >
           <span class="material-symbols-outlined" title="Voltar">
             arrow_back_ios_new
@@ -13,9 +13,12 @@
         </span>
       </nav>
     </header>
+
     <main class="d-flex flex-column justify-content-between">
       <router-view></router-view>
     </main>
+
+    <consulta-footer></consulta-footer>
   </section>
 </template>
 
@@ -24,6 +27,7 @@ import ConsultaHeadTitle from "./components/ConsultaHeaderTitle.vue";
 import ConsultaAtendimento from "./views/ConsultaAtendimento.vue";
 import ConsultaProfissional from "./views/ConsultaProfissional.vue";
 import ConsultaRevisao from "./views/ConsultaRevisao.vue";
+import ConsultaFooter from "./components/ConsultaFooter.vue";
 
 export default {
   name: "App",
@@ -32,9 +36,10 @@ export default {
     ConsultaAtendimento,
     ConsultaProfissional,
     ConsultaRevisao,
+    ConsultaFooter,
   },
   methods: {
-    goback() {
+    voltarUmaPagina() {
       this.$router.back(-1);
     },
   },

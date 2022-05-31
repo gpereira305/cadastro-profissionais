@@ -13,9 +13,9 @@
           <select
             class="form-select consulta__border"
             aria-label="Selecionado padrão"
-            v-model="selectedEspecialidade"
+            v-model="selected_especialidade"
           >
-            <option selected disabled>{{ selectedEspecialidade }}</option>
+            <option selected disabled>{{ selected_especialidade }}</option>
             <option
               v-for="especialidade in especialidades"
               :key="especialidade.id"
@@ -119,6 +119,7 @@
           </div>
         </div>
 
+        <!-- COMPONENT BOTÃO  -->
         <consulta-progress-bar
           :barLength="barLength"
           :barBorder="barBorder"
@@ -141,7 +142,7 @@
 
     <div class="revisao__image">
       <div>
-        <img :src="patientImage" alt="Paciente" />
+        <img :src="patientImage" alt="Paciente" title="Paciente" />
       </div>
     </div>
   </consulta-main>
@@ -179,7 +180,7 @@ export default {
       apiEspacialidades:
         "https://api-teste-front-end-fc.herokuapp.com/especialidades",
       isActive: false,
-      selectedEspecialidade: this.selectedEspecialidade || "Selecione",
+      selected_especialidade: this.selected_especialidade || "Selecione",
 
       valor: null,
       pagamento: [],
@@ -196,7 +197,7 @@ export default {
   },
   methods: {
     getRevisao() {
-      if (!this.selectedEspecialidade.nome) {
+      if (!this.selected_especialidade.nome) {
         this.$toast.open({
           message: "A especialidade do profissional é obrigatório!",
         });
@@ -211,7 +212,7 @@ export default {
         this.valor.replace(/\,/g, "") > 35000
       ) {
         this.$toast.open({
-          message: "O valor estar entre 30,00 e 350,00",
+          message: "O valor de ser entre 30,00 e 350,00",
         });
         return;
       } else if (
@@ -228,16 +229,16 @@ export default {
           message: "A quantidade de parcelas é obrigatório!",
         });
         return;
+      } else {
+        const dadosAtendimento = {
+          especialidade: this.selected_especialidade,
+          valor: this.valor,
+          pagamento: this.pagamento,
+          parcelamento: this.parcelamento,
+        };
+        localStorage.dados_atendimento = JSON.stringify(dadosAtendimento);
+        this.$router.push("/revisão");
       }
-
-      this.$router.push("/revisão");
-      const dadosAtendimento = {
-        especialidade: this.selectedEspecialidade,
-        valor: this.valor,
-        pagamento: this.pagamento,
-        parcelamento: this.parcelamento,
-      };
-      localStorage.dados_atendimento = JSON.stringify(dadosAtendimento);
     },
     toggleChecked() {
       this.isActive = !this.isActive;
@@ -266,14 +267,13 @@ export default {
         window.localStorage.dados_atendimento
       );
       ({
-        especialidade: this.selectedEspecialidade,
+        especialidade: this.selected_especialidade,
         pagamento: this.pagamento,
         parcelamento: this.parcelamento,
         valor: this.valor,
       } = this.dados_atendimento);
-
-      console.log(this.dados_atendimento);
     }
+
     axios
       .get(this.apiEspacialidades)
       .then((res) => {

@@ -32,6 +32,7 @@ export default {
   font-weight: 700;
   line-height: 2.4;
   transition: var(--transition);
+  font-family: var(--primary-font);
 }
 
 .consulta__btn:hover {

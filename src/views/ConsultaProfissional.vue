@@ -53,15 +53,15 @@
           <div class="col">
             <label>Estado*</label>
             <select
-              class="form-select consulta__border"
+              class="form-select consulta__border pointer"
               aria-label="Selecionado padrão"
-              v-model="selectedEstado"
+              v-model="selected_estado"
               @change="fetchCidades"
-              :disabled="!todosEstados.length"
+              :disabled="!todos_estados.length"
             >
-              <option>{{ selectedEstado }}</option>
+              <option>{{ selected_estado }}</option>
               <option
-                v-for="estado in todosEstados"
+                v-for="estado in todos_estados"
                 :key="estado.id"
                 :value="estado"
               >
@@ -73,16 +73,16 @@
           <div class="col">
             <label>Cidade*</label>
             <select
-              class="form-select consulta__border"
+              class="form-select consulta__border pointer"
               aria-label="Selecionado padrão"
-              v-model="selectedCidade"
-              :disabled="!cidadesFiltradas.length"
+              v-model="selected_cidade"
+              :disabled="!cidades_filtradas.length"
             >
               <option selected disabled>
-                {{ selectedCidade }}
+                {{ selected_cidade }}
               </option>
               <option
-                v-for="cidade in cidadesFiltradas"
+                v-for="cidade in cidades_filtradas"
                 :key="cidade.id"
                 :value="cidade"
               >
@@ -92,6 +92,7 @@
           </div>
         </div>
 
+        <!-- COMPONENT BOTÃO  -->
         <consulta-progress-bar
           :barLength="barLength"
           :barBorder="barBorder"
@@ -113,7 +114,7 @@
 
     <div class="revisao__image">
       <div>
-        <img :src="doctorsImage" alt="Médicos" />
+        <img :src="doctorsImage" alt="Médicos" title="Médicos" />
       </div>
     </div>
   </consulta-main>
@@ -155,14 +156,14 @@ export default {
         "https://api-teste-front-end-fc.herokuapp.com/estados",
         "https://api-teste-front-end-fc.herokuapp.com/profissionais",
       ],
-      todosEstados: [],
-      cidadesFiltradas: [],
+      todos_estados: [],
+      cidades_filtradas: [],
 
       nome: this.nome || "",
       cpf: this.cpf || "",
       telefone: this.telefone || "",
-      selectedEstado: this.selectedEstado || "Selecione",
-      selectedCidade: this.selectedCidade || "Selecione",
+      selected_estado: this.selected_estado || "Selecione",
+      selected_cidade: this.selected_cidade || "Selecione",
 
       dados_usuario: [],
       profissionais: [],
@@ -210,12 +211,12 @@ export default {
           message: "O telefone precisa ter 11 caracteres!",
         });
         return;
-      } else if (!this.selectedEstado.nome) {
+      } else if (!this.selected_estado.nome) {
         this.$toast.open({
           message: "Estado é obrigatório!",
         });
         return;
-      } else if (!this.selectedCidade.nome) {
+      } else if (!this.selected_cidade.nome) {
         this.$toast.open({
           message: "Cidade é obrigatório!",
         });
@@ -230,10 +231,11 @@ export default {
           nome: this.nome,
           cpf: this.cpf,
           telefone: this.telefone,
-          estado: this.selectedEstado,
-          cidade: this.selectedCidade,
+          estado: this.selected_estado,
+          cidade: this.selected_cidade,
         };
 
+        // salvar dados coletado no localstorage
         if (!dadosColetados) {
           this.dados_usuario.push(dadosColetados);
         }
@@ -245,9 +247,9 @@ export default {
       axios
         .get(this.apiCidades)
         .then((res) => {
-          this.cidadesFiltradas = res.data;
-          this.cidadesFiltradas = this.cidadesFiltradas.filter(
-            (cidade) => cidade.estadoId === this.selectedEstado.id
+          this.cidades_filtradas = res.data;
+          this.cidades_filtradas = this.cidades_filtradas.filter(
+            (cidade) => cidade.estadoId === this.selected_estado.id
           );
         })
         .catch((err) => console.log(err.message));
@@ -278,16 +280,16 @@ export default {
         nome: this.nome,
         cpf: this.cpf,
         telefone: this.telefone,
-        cidade: this.selectedCidade,
-        estado: this.selectedEstado,
+        cidade: this.selected_cidade,
+        estado: this.selected_estado,
       } = this.dados_usuario);
     }
 
     axios
       .all(this.apiDados.map((data) => axios.get(data)))
       .then(
-        axios.spread(({ data: todosEstados }, { data: profissionais }) => {
-          (this.todosEstados = todosEstados),
+        axios.spread(({ data: todos_estados }, { data: profissionais }) => {
+          (this.todos_estados = todos_estados),
             (this.profissionais = profissionais);
           this.profissionais[profissionais];
         })
@@ -311,6 +313,9 @@ form .col-form-label {
 
 .consulta__input {
   max-width: 285px;
+}
+.pointer {
+  cursor: pointer;
 }
 
 @media (max-width: 620px) {

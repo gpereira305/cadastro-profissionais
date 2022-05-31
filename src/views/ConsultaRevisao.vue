@@ -17,7 +17,7 @@
         </div>
         <div class="revisao__text--content">
           <p>Estado/Cidade</p>
-          <p>{{ data.estado.nome }} / {{ data.cidade.nome }}</p>
+          <p>{{ data.estado.nome }} - {{ data.cidade.nome }}</p>
         </div>
         <div class="revisao__text--content">
           <p>Especialidade principal</p>
@@ -49,7 +49,7 @@
           @click="getCadastro"
         >
         </consulta-button>
-        <span class="mt-4" @click="redirecionarHome">Editar cadastro</span>
+        <span class="mt-4" @click="redirecionar_home">Editar cadastro</span>
       </div>
     </div>
 
@@ -73,7 +73,7 @@ export default {
   },
   data() {
     return {
-      headerTitle: "Revisão de cadastro",
+      headerTitle: "Revisão do cadastro",
       btnTitle: "Cadastrar Profissional",
       backgroundProp: "var(--cta0)",
       colorProp: "var(--secondary7)",
@@ -95,7 +95,7 @@ export default {
     };
   },
   methods: {
-    redirecionarHome() {
+    redirecionar_home() {
       this.$router.push("/");
     },
     getCadastro() {

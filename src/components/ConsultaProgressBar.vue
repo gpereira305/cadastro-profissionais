@@ -27,7 +27,6 @@ export default {
   width: 100%;
   height: 20px;
   border-radius: 3px;
-  /* border: 1px solid var(--primary0); */
   flex: 3;
   position: relative;
 }
@@ -42,7 +41,7 @@ export default {
   width: 100%;
   flex: 1;
   text-align: center;
-  font-weight: 700;
+  font-weight: normal;
   color: var(--primary0);
   margin: 0;
 }
