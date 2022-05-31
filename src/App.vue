@@ -123,12 +123,11 @@ main {
 }
 
 .revisao__text--content p:first-child {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .revisao__text--content p:last-child {
   color: rgb(0 0 0 / 70%);
-  font-weight: 500;
 }
 
 .revisao__image {

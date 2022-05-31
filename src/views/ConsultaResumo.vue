@@ -46,7 +46,8 @@ export default {
     },
     goingHome() {
       this.$router.push("/");
-      window.localStorage.clear();
+      localStorage.removeItem("dados_usuario");
+      localStorage.removeItem("dados_atendimento");
     },
   },
   mounted() {

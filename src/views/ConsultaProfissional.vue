@@ -6,7 +6,7 @@
 
   <consulta-main>
     <div class="revisao__text">
-      <form @submit.prevent="getTodosOsDados">
+      <form @submit.prevent="get_todos_dados">
         <!-- NOME -->
         <div class="col mt-3">
           <label class="col-form-label">Nome Completo*</label>
@@ -16,7 +16,7 @@
             placeholder="Digite o nome completo"
             aria-label="Nome completo"
             v-model="nome"
-            @keypress="getApenasTexto"
+            @keypress="get_apenas_texto"
           />
         </div>
 
@@ -29,7 +29,7 @@
             placeholder="Digite um CPF"
             aria-label="Número de CPF"
             v-model.trim="cpf"
-            @keypress="getApenasNums"
+            @keypress="get_apenas_numeros"
             v-mask="['###.###.###-##']"
           />
         </div>
@@ -43,12 +43,12 @@
             placeholder="(00) 00000-0000"
             aria-label="Número de celular"
             v-model="telefone"
-            @keypress="getApenasNums"
+            @keypress="get_apenas_numeros"
             v-mask="['(##) ####-####', '(##) #####-####']"
           />
         </div>
 
-        <!-- CIDADE/ESTADO -->
+        <!-- ESTADO -->
         <div class="row mt-5 consulta__select">
           <div class="col">
             <label>Estado*</label>
@@ -56,7 +56,7 @@
               class="form-select consulta__border pointer"
               aria-label="Selecionado padrão"
               v-model="selected_estado"
-              @change="fetchCidades"
+              @change="fetch_cidades"
               :disabled="!todos_estados.length"
             >
               <option>{{ selected_estado }}</option>
@@ -70,6 +70,7 @@
             </select>
           </div>
 
+          <!-- CIDADE -->
           <div class="col">
             <label>Cidade*</label>
             <select
@@ -126,6 +127,7 @@ import ConsultaButton from "@/components/ConsultaButton.vue";
 import ConsultaAtendimento from "./ConsultaAtendimento.vue";
 import ConsultaProgressBar from "@/components/ConsultaProgressBar.vue";
 
+import { api_cidades, api_estados_profissionais } from "../api";
 import axios from "axios";
 import { mask } from "vue-the-mask";
 
@@ -151,11 +153,9 @@ export default {
       barBorder: "3px 0 0 3px",
       barSteps: 1,
       doctorsImage: require("@/assets/images/doctors.png"),
-      apiCidades: "https://api-teste-front-end-fc.herokuapp.com/cidades",
-      apiDados: [
-        "https://api-teste-front-end-fc.herokuapp.com/estados",
-        "https://api-teste-front-end-fc.herokuapp.com/profissionais",
-      ],
+      api_cidades,
+      api_estados_profissionais,
+
       todos_estados: [],
       cidades_filtradas: [],
 
@@ -169,26 +169,29 @@ export default {
       profissionais: [],
     };
   },
-
   methods: {
-    getTodosOsDados() {
+    get_todos_dados() {
       const cpfIsValid = this.profissionais.some(
         (item) => item.cpf === this.cpf.replace(/[\. ,:-]+/g, "")
       );
-
-      if (!this.nome) {
+      if (
+        !this.nome &&
+        !this.cpf &&
+        !this.telefone &&
+        !this.selected_estado.nome &&
+        !this.selected_cidade.nome
+      ) {
+        this.$toast.open({
+          message: "Preencha os campos vazios!",
+        });
+      } else if (!this.nome) {
         this.$toast.open({
           message: "Nome é obrigatório!",
         });
         return;
-      } else if (this.nome.length < 6) {
+      } else if (this.nome.length < 4 || this.nome.length > 48) {
         this.$toast.open({
-          message: "O nome precisa ser maior do que 6 caracteres!",
-        });
-        return;
-      } else if (this.nome.length > 30) {
-        this.$toast.open({
-          message: "O nome é muito longo!",
+          message: "O nome precisa ser de 3 a 48 caracteres!",
         });
         return;
       } else if (!this.cpf) {
@@ -234,8 +237,6 @@ export default {
           estado: this.selected_estado,
           cidade: this.selected_cidade,
         };
-
-        // salvar dados coletado no localstorage
         if (!dadosColetados) {
           this.dados_usuario.push(dadosColetados);
         }
@@ -243,9 +244,9 @@ export default {
         this.$router.push("/atendimento");
       }
     },
-    fetchCidades() {
+    fetch_cidades() {
       axios
-        .get(this.apiCidades)
+        .get(this.api_cidades)
         .then((res) => {
           this.cidades_filtradas = res.data;
           this.cidades_filtradas = this.cidades_filtradas.filter(
@@ -254,7 +255,7 @@ export default {
         })
         .catch((err) => console.log(err.message));
     },
-    getApenasNums(e) {
+    get_apenas_numeros(e) {
       e = e ? e : window.event;
       const charCode = e.which ? e.which : e.keyCode;
       if (
@@ -267,7 +268,7 @@ export default {
         return true;
       }
     },
-    getApenasTexto(e) {
+    get_apenas_texto(e) {
       const char = String.fromCharCode(e.keyCode);
       if (/^[A-Za-z ]+$/.test(char)) return true;
       else e.preventDefault();
@@ -286,7 +287,7 @@ export default {
     }
 
     axios
-      .all(this.apiDados.map((data) => axios.get(data)))
+      .all(this.api_estados_profissionais.map((data) => axios.get(data)))
       .then(
         axios.spread(({ data: todos_estados }, { data: profissionais }) => {
           (this.todos_estados = todos_estados),

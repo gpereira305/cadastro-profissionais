@@ -6,7 +6,7 @@
 
   <consulta-main>
     <div class="revisao__text">
-      <form @submit.prevent="getRevisao">
+      <form @submit.prevent="get_revisao">
         <!-- ESPECIALIDADE -->
         <div class="col">
           <label>Especialidade principal*</label>
@@ -42,7 +42,7 @@
               v-model="valor"
               minlength="5"
               maxlength="6"
-              @keypress="getApenasNums"
+              @keypress="get_apenas_numeros"
               v-mask="['##,##', '###,##']"
             />
           </div>
@@ -59,7 +59,7 @@
               id="flexRadioDefault1"
               v-model="pagamento"
               value="Pix"
-              @click="removeChecked()"
+              @click="remover_checked()"
             />
             <label class="form-check-label" for="flexRadioDefault1">
               Pix
@@ -74,7 +74,7 @@
               id="flexRadioDefault2"
               v-model="pagamento"
               value="Dinheiro"
-              @click="removeChecked()"
+              @click="remover_checked()"
             />
             <label class="form-check-label" for="flexRadioDefault2">
               Em dinheiro
@@ -87,7 +87,7 @@
               type="radio"
               name="flexRadioDefault"
               id="flexRadioDefault3"
-              @click="toggleChecked()"
+              @click="toggle_checked()"
               v-model="pagamento"
               value="Cartão de crédito"
             />
@@ -153,6 +153,8 @@ import ConsultaMain from "@/components/ConsultaMain.vue";
 import ConsultaButton from "@/components/ConsultaButton.vue";
 import ConsultaRevisao from "./ConsultaRevisao.vue";
 import ConsultaProgressBar from "@/components/ConsultaProgressBar.vue";
+
+import { api_especialidades } from "../api";
 import axios from "axios";
 import { mask } from "vue-the-mask";
 
@@ -177,8 +179,8 @@ export default {
       barBorder: "3px",
       barSteps: 2,
       patientImage: require("@/assets/images/patient.png"),
-      apiEspacialidades:
-        "https://api-teste-front-end-fc.herokuapp.com/especialidades",
+
+      api_especialidades,
       isActive: false,
       selected_especialidade: this.selected_especialidade || "Selecione",
 
@@ -196,7 +198,10 @@ export default {
     };
   },
   methods: {
-    getRevisao() {
+    scrollToTop() {
+      window.scrollTo(0, 0);
+    },
+    get_revisao() {
       if (!this.selected_especialidade.nome) {
         this.$toast.open({
           message: "A especialidade do profissional é obrigatório!",
@@ -240,14 +245,14 @@ export default {
         this.$router.push("/revisão");
       }
     },
-    toggleChecked() {
+    toggle_checked() {
       this.isActive = !this.isActive;
     },
-    removeChecked() {
+    remover_checked() {
       this.isActive = false;
       this.payTimes = null;
     },
-    getApenasNums(e) {
+    get_apenas_numeros(e) {
       e = e ? e : window.event;
       const charCode = e.which ? e.which : e.keyCode;
       if (
@@ -262,6 +267,8 @@ export default {
     },
   },
   mounted() {
+    this.scrollToTop();
+
     if (localStorage.dados_atendimento) {
       this.dados_atendimento = JSON.parse(
         window.localStorage.dados_atendimento
@@ -275,7 +282,7 @@ export default {
     }
 
     axios
-      .get(this.apiEspacialidades)
+      .get(this.api_especialidades)
       .then((res) => {
         this.especialidades = res.data;
       })

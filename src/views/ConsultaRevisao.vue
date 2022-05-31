@@ -5,7 +5,9 @@
       <div v-for="data in dadosColetados" :key="data.id">
         <div class="revisao__text--content">
           <p>Nome completo</p>
-          <p>{{ data.nome }}</p>
+          <p :title="data.nome">
+            {{ redutor_nome(data.nome) }}
+          </p>
         </div>
         <div class="revisao__text--content">
           <p>CPF</p>
@@ -77,15 +79,6 @@ export default {
       btnTitle: "Cadastrar Profissional",
       backgroundProp: "var(--cta0)",
       colorProp: "var(--secondary7)",
-
-      name: "Fabrício Rodrigues de Oliveira",
-      cpf: "485.628.337-89",
-      phone: "(53)88620847",
-      cityAndState: "Rio Grande do Sul - Pelotas",
-      role: "Cardiologia",
-      totalPrice: "200,00",
-      paymentMethod: "Cartão de crédito - Parcelamento em 2x sem juros",
-
       nurseImage: require("../assets/images/nurse.png"),
 
       dadosColetados: [],
@@ -101,8 +94,13 @@ export default {
     getCadastro() {
       this.$router.push("/resumo");
     },
+    scrollToTop() {
+      window.scrollTo(0, 0);
+    },
   },
   mounted() {
+    this.scrollToTop();
+
     if (localStorage.dados_usuario || localStorage.dados_atendimento) {
       this.dados_usuario = JSON.parse(window.localStorage.dados_usuario);
       this.dados_atendimento = JSON.parse(
@@ -114,6 +112,11 @@ export default {
       );
       this.dadosColetados.push(this.todosOsDadosSalvos);
     }
+  },
+  computed: {
+    redutor_nome() {
+      return (text) => (text.length > 30 ? `${text.slice(0, 30)}...` : text);
+    },
   },
 };
 </script>
